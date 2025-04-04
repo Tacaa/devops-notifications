@@ -22,17 +22,20 @@ public class NotificationController {
     @Autowired
     private NotificationService notificationService;
 
+    //front
     @GetMapping(value = "/{userId}")
     public ResponseEntity<List<NotificationDTO>> getAllNotificationsByUserId(@PathVariable Integer userId) {
         List<Notification> notifications = notificationService.getAllNotificationsByUserId(userId);
         return new ResponseEntity<>(NotificationDTO.fromEntities(notifications), HttpStatus.OK);
     }
 
+    //review i accommodation poziva
     @PostMapping({"/save"})
-    public Boolean save(@RequestBody CreateNotificationDTO createNotificationDTO){
+    public boolean save(@RequestBody CreateNotificationDTO createNotificationDTO){
         return notificationService.save(createNotificationDTO).getId() != null;
     }
 
+    //front
     @PutMapping(value = "/read")
     public ResponseEntity<List<NotificationDTO>> update(@RequestBody List<ReadNotificationDTO> readNotificationDTOs){
         List<Notification> notifications = notificationService.update(readNotificationDTOs);

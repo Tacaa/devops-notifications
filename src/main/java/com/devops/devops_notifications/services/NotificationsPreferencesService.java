@@ -26,7 +26,7 @@ public class NotificationsPreferencesService {
         return notificationsPreferencesRepository.findByUserId(userId);
     }
 
-    public NotificationPreference save(Integer userId, Boolean guest) {
+    public NotificationPreference save(Integer userId, boolean guest) {
         NotificationPreference notificationPreference;
         if(guest){
             notificationPreference = NotificationPreference.builder()
