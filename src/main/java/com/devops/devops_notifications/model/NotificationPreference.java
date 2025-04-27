@@ -19,6 +19,9 @@ public class NotificationPreference {
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
+    @Column(name = "is_guest", nullable = false)
+    private boolean isGuest;
+
     @Column(name = "reservation_request_enabled", nullable = false)
     private boolean reservationRequestEnabled;
 
