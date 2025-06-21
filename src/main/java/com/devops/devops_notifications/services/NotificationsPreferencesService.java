@@ -7,6 +7,7 @@ import com.devops.devops_notifications.dto.ReadNotificationDTO;
 import com.devops.devops_notifications.model.Notification;
 import com.devops.devops_notifications.model.NotificationPreference;
 import com.devops.devops_notifications.repository.NotificationsPreferencesRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 public class NotificationsPreferencesService {
 
@@ -23,10 +25,13 @@ public class NotificationsPreferencesService {
     private NotificationsPreferencesRepository notificationsPreferencesRepository;
 
     public NotificationPreference getAllNotificationsPreferencesByUserId(Integer userId) {
+        log.info("Fetching notification preferences for user ID: {}", userId);
         return notificationsPreferencesRepository.findByUserId(userId);
     }
 
     public NotificationPreference save(Integer userId, boolean guest) {
+        log.info("Creating default notification preferences for user ID: {}, isGuest: {}", userId, guest);
+
         NotificationPreference notificationPreference;
         if(guest){
             notificationPreference = NotificationPreference.builder()
@@ -53,6 +58,8 @@ public class NotificationsPreferencesService {
     }
 
     public NotificationPreference update(NotificationsPreferencesDTO notificationsPreferencesDTO) {
+        log.info("Updating notification preferences for user ID: {}", notificationsPreferencesDTO.getUserId());
+
         NotificationPreference notificationPreference = notificationsPreferencesRepository.findByUserId(notificationsPreferencesDTO.getUserId());
         notificationPreference.setAccommodationReviewEnabled(notificationsPreferencesDTO.isAccommodationReviewEnabled());
         notificationPreference.setHostReviewEnabled(notificationsPreferencesDTO.isHostReviewEnabled());

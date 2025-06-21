@@ -7,6 +7,7 @@ import com.devops.devops_notifications.model.Notification;
 import com.devops.devops_notifications.model.NotificationPreference;
 import com.devops.devops_notifications.repository.NotificationRepository;
 import com.devops.devops_notifications.repository.NotificationsPreferencesRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class NotificationService {
 
@@ -27,9 +29,11 @@ public class NotificationService {
     private NotificationsPreferencesRepository notificationsPreferencesRepository;
 
     public List<Notification> getAllNotificationsByUserId(Integer userId) {
+        log.info("Fetching notifications for user ID: {}", userId);
         NotificationPreference preferences = notificationsPreferencesRepository.findByUserId(userId);
 
         if (preferences == null) {
+            log.warn("No notification preferences found for user ID: {}", userId);
             return Collections.emptyList();
         }
 
@@ -54,12 +58,17 @@ public class NotificationService {
         if (preferences.isHostReviewEnabled()) {
             notificationTypes.add(NotificationType.HOST_REVIEW);
         }
+        log.info("Allowed notification types for user ID {}: {}", userId, notificationTypes);
 
         return notificationRepository.findByReceiverIdAndNotificationTypeIn(userId, notificationTypes);
     }
 
     public Notification save(CreateNotificationDTO createNotificationDTO){
-       Notification notification = Notification.builder()
+        log.info("Saving notification for receiver ID: {}, type: {}",
+                createNotificationDTO.getReceiverId(),
+                createNotificationDTO.getNotificationType());
+
+        Notification notification = Notification.builder()
                .receiverId(createNotificationDTO.getReceiverId())
                .senderId(createNotificationDTO.getSenderId())
                .title(createNotificationDTO.getTitle())
@@ -69,6 +78,7 @@ public class NotificationService {
                .createdAt(LocalDate.now())
                .build();
 
+        log.info("Notification saved!");
         return this.notificationRepository.save(notification);
     }
 
@@ -76,6 +86,8 @@ public class NotificationService {
         List<Integer> ids = readNotificationDTOs.stream()
                 .map(ReadNotificationDTO::getId)
                 .toList();
+
+        log.info("Updating read status for notifications: {}", ids);
 
         List<Notification> notificationsDB = notificationRepository.findListOfNotifications(ids);
 
@@ -86,6 +98,7 @@ public class NotificationService {
             ReadNotificationDTO matchingNotification = notificationDTOMap.get(notification.getId());
             if (matchingNotification != null) {
                 notification.setRead(matchingNotification.isRead());
+                log.debug("Notification ID {} marked as read: {}", notification.getId(), matchingNotification.isRead());
             }
         });
 
